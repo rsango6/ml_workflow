@@ -26,4 +26,6 @@ The pipeline handles the end-to-end machine learning lifecycle:
 Ensure you have Python 3.8+ and the following dependencies installed:
 
 ```bash
-pip install pandas numpy matplotlib seaborn scikit-learn imbalanced-learn xgboost
+uv venv
+source .venv/bin/activate
+uv pip install pandas numpy matplotlib seaborn scikit-learn imbalanced-learn xgboost
