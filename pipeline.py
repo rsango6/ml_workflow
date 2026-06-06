@@ -104,14 +104,12 @@ class ClinicalModelPipeline:
         """
         
         # Step 1: Define how to handle Categorical Data
-        # 'ignore' handles unknown categories in the test set gracefully
         categorical_transformer = Pipeline(steps=[
             ('imputer', SimpleImputer(strategy='most_frequent')),
             ('encoder', OneHotEncoder(handle_unknown='ignore'))
         ])
 
         # Step 2: Bundle preprocessing
-        # We use ColumnTransformer to apply specific logic to specific columns
         self.preprocessor = ColumnTransformer(
             transformers=[
                 ('cat', categorical_transformer, self.config.CAT_FEATURES)
