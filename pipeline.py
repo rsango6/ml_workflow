@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val_score, GridSearchCV
+from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val_score, GridSearchCV, cross_validate
 from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
 from sklearn.metrics import (classification_report, roc_auc_score, 
@@ -157,7 +157,6 @@ class ClinicalModelPipeline:
         
         # Calculate metrics using cross_validate
         scoring = {'roc_auc': 'roc_auc', 'mcc': 'matthews_corrcoef', 'f1': 'f1'}
-        from sklearn.model_selection import cross_validate
         
         scores = cross_validate(pipeline, X, y, cv=cv, scoring=scoring, n_jobs=-1)
         
