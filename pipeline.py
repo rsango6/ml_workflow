@@ -28,7 +28,6 @@ logger = logging.getLogger(__name__)
 class Config:
     """
     Configuration class to ensure reproducibility and easy management of parameters.
-    This replaces hard-coded paths in the script.
     """
     def __init__(self, 
                  train_path='Tim_21/Podaci/train.csv', 
@@ -72,7 +71,7 @@ class ClinicalModelPipeline:
     def visualize_distributions(self, df: pd.DataFrame, base_dir: str = 'plots') -> None:
         """
         Generates interpretable visualizations for distribution analysis.
-        Saves them to disk rather than just showing them, which is better for automated runs.
+        Saves them to disk rather than just showing them.
         """
 
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
