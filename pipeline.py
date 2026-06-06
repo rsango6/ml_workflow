@@ -68,11 +68,15 @@ class ClinicalModelPipeline:
         logger.info(f"Train shape: {train_df.shape}, Test shape: {test_df.shape}")
         return train_df, test_df
 
-    def visualize_distributions(self, df: pd.DataFrame, output_dir: str = 'plots') -> None:
+    def visualize_distributions(self, df: pd.DataFrame, base_dir: str = 'plots') -> None:
         """
         Generates interpretable visualizations for distribution analysis.
         Saves them to disk rather than just showing them, which is better for automated runs.
         """
+
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_dir = f"{base_dir}_{timestamp}"
+        
         os.makedirs(output_dir, exist_ok=True)
         
         # 1. Target Class Balance
@@ -97,9 +101,6 @@ class ClinicalModelPipeline:
     def build_pipeline(self, classifier) -> ImbPipeline:
         """
         Constructs a reproducible sklearn pipeline.
-        
-        This solves the 'Data Leakage' issue in your original code by ensuring
-        imputation strategies (mode) are learned ONLY on the training folds.
         """
         
         # Step 1: Define how to handle Categorical Data
