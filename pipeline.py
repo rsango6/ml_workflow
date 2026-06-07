@@ -188,7 +188,7 @@ class ClinicalModelPipeline:
         logger.info(f"Mean MCC: {np.mean(scores['test_mcc']):.4f}")
         logger.info(f"Mean F1: {np.mean(scores['test_f1']):.4f}")
 
-        mean_auc = np.mean(scores['test_roc_auc')
+        mean_auc = np.mean(scores['test_roc_auc'])
 
         logger.info(f"{model_type.upper()} - Mean AUC: {mean_auc:.4f} | | Mean F1: {np.mean(scores['test_f1']):.4f}")
 
