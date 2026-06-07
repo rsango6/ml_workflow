@@ -1,4 +1,5 @@
 import os
+import glob
 import datetime
 import logging
 import argparse
@@ -194,22 +195,22 @@ class ClinicalModelPipeline:
 
         return mean_auc
 
-  def train_final_model(self, X: pd.DataFrame, y: pd.Series, best_model_type: str) -> None:
-          """
-          Takes the best model type, builds a pipeline, and trains it on entire training data.
-          """
-          logger.info(f"--- Preparing Final Model: {best_model_type.upper()} ---")
-          
-          # 1. Grab the best model
-          if best_model_type == 'xgb':
-              clf = XGBClassifier(
-                  n_estimators=300, max_depth=10, objective='binary:logistic',
-                  eval_metric='logloss', random_state=self.config.RANDOM_STATE
-              )
-          else:
-              clf = RandomForestClassifier(
-                  n_estimators=500, max_leaf_nodes=16, random_state=self.config.RANDOM_STATE
-              )
+    def train_final_model(self, X: pd.DataFrame, y: pd.Series, best_model_type: str) -> None:
+        """
+        Takes the best model type, builds a pipeline, and trains it on entire training data.
+        """
+        logger.info(f"--- Preparing Final Model: {best_model_type.upper()} ---")
+        
+        # 1. Grab the best model
+        if best_model_type == 'xgb':
+            clf = XGBClassifier(
+                n_estimators=300, max_depth=10, objective='binary:logistic',
+                eval_metric='logloss', random_state=self.config.RANDOM_STATE
+            )
+        else:
+            clf = RandomForestClassifier(
+                n_estimators=500, max_leaf_nodes=16, random_state=self.config.RANDOM_STATE
+            )
 
         # 2. Build the final pipeline
         final_pipeline = self.build_pipeline(clf)
@@ -245,7 +246,7 @@ def main():
     parser.add_argument('--fast', action='store_true', help='Quick test with 2 CV folds')
     
     args = parser.parse_args()
-    folds = 2 of args.fast else 5
+    folds = 2 if args.fast else 5
 
     # Initialize Config
     config = Config(data_dir=args.data_dir, cv_folds=folds)
@@ -264,8 +265,8 @@ def main():
         pipeline.visualize_distributions(train_df)
 
         # 3. Evaluate Both Models
-        rf_score = pipeline.evaluate_model(X, y, model_type='rf')
-        xgb_score = pipeline.evaluate_model(X, y, model_type='xgb')
+        rf_score = pipeline.run_cv_evaluation(X, y, model_type='rf')
+        xgb_score = pipeline.run_cv_evaluation(X, y, model_type='xgb')
 
         if xgb_score > rf_score:
             best_model = 'xgb'
@@ -279,28 +280,6 @@ def main():
 
         # 5. Predict on Test Data (Using the Winner!)
         predictions = pipeline.predict(test_df)
-        predictions.to_csv('predictions.csv')
-
-        logger.info(f"Predictions saved to {output_file}")
-      
-        # 1. Load Data
-        train_df, test_df = pipeline.load_data()
-
-        # 2. Split Features/Target
-        X = train_df.drop(columns=[config.TARGET_COL])
-        y = train_df[config.TARGET_COL]
-
-        # 3. EDA (Saved to 'plots' folder)
-        pipeline.visualize_distributions(train_df)
-
-        # 4. Train & Evaluate
-        pipeline.run_cv_evaluation(X, y, model_type=args.model)
-
-        # 5. Predict on Test
-        # Note: We pass the raw test dataframe. The pipeline handles missing columns/NAs automatically.
-        predictions = pipeline.predict(test_df)
-        
-        # 6. Save Results
         output_file = 'predictions.csv'
         predictions.to_csv(output_file)
         logger.info(f"Predictions saved to {output_file}")
