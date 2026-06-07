@@ -21,9 +21,24 @@ from sklearn.impute import SimpleImputer
 from imblearn.pipeline import Pipeline as ImbPipeline
 from imblearn.over_sampling import SMOTE
 
-# Configure Logging to track the pipeline's progress
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# Custom logger
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+# format the output
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+
+# create console handler
+console_handler = logging.StreamHandler()
+console_handler.setFormatter(formatter)
+
+# create file handler
+file_handler = logging.FileHandler('pipeline_run.log')
+file_handler.setFormatter(formatter)
+
+# attach both handlers
+logger.addHandler(console_handler)
+logger.addHandler(file_handler)
 
 class Config:
     """
