@@ -245,7 +245,7 @@ def main():
     parser.add_argument('--fast', action='store_true', help='Quick test with 2 CV folds')
     
     args = parser.parse_args()
-    folds = 2 of args.fast else 5
+    folds = 2 if args.fast else 5
 
     # Initialize Config
     config = Config(data_dir=args.data_dir, cv_folds=folds)
