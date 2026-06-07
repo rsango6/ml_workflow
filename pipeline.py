@@ -163,11 +163,38 @@ class ClinicalModelPipeline:
         logger.info(f"Mean AUC: {np.mean(scores['test_roc_auc']):.4f}")
         logger.info(f"Mean MCC: {np.mean(scores['test_mcc']):.4f}")
         logger.info(f"Mean F1: {np.mean(scores['test_f1']):.4f}")
+
+        mean_auc = np.mean(scores['test_roc_auc')
+
+        logger.info(f"{model_type.upper()} - Mean AUC: {mean_auc:.4f} | | Mean F1: {np.mean(scores['test_f1']):.4f}")
+
+        return mean_auc
+
+  def train_final_model(self, X: pd.DataFrame, y: pd.Series, best_model_type: str) -> None:
+          """
+          Takes the best model type, builds a pipeline, and trains it on entire training data.
+          """
+          logger.info(f"--- Preparing Final Model: {best_model_type.upper()} ---")
+          
+          # 1. Grab the best model
+          if best_model_type == 'xgb':
+              clf = XGBClassifier(
+                  n_estimators=300, max_depth=10, objective='binary:logistic',
+                  eval_metric='logloss', random_state=self.config.RANDOM_STATE
+              )
+          else:
+              clf = RandomForestClassifier(
+                  n_estimators=500, max_leaf_nodes=16, random_state=self.config.RANDOM_STATE
+              )
+
+        # 2. Build the final pipeline
+        final_pipeline = self.build_pipeline(clf)
         
-        # Final Step: Train the model on the full training data so it's ready for testing
-        self.model = pipeline
+        # 3. Save it to the class and train on 100% of X and y
+        self.model = final_pipeline
         self.model.fit(X, y)
-        logger.info("Final model fitted on full training set.")
+        
+        logger.info("Final model successfully fitted and ready for testing")
 
     def predict(self, test_df: pd.DataFrame) -> pd.DataFrame:
         """
@@ -203,6 +230,35 @@ def main():
     pipeline = ClinicalModelPipeline(config)
 
     try:
+
+        # 1. load data 
+        train_df, test_df = pipeline.load_data()
+        X = train_df.drop(columns=[config.TARGET_COL])
+        y = train_df[config.TARGET_COL]
+
+        # 2. EDA
+        pipeline.visualize_distributions(train_df)
+
+        # 3. Evaluate Both Models
+        rf_score = pipeline.evaluate_model(X, y, model_type='rf')
+        xgb_score = pipeline.evaluate_model(X, y, model_type='xgb')
+
+        if xgb_score > rf_score:
+            best_model = 'xgb'
+            logger.info(f"Winning Model: XGBoost outperformed Random Forest ({xgb_score:.4f} > {rf_score:.4f})")
+        else:
+            best_model = 'rf'
+            logger.info(f"Winning Model: Random Forest outperformed XGBoost ({rf_score:.4f} >= {xgb_score:.4f})")
+
+        # 4. Train the Final Version of the Winning Model
+        pipeline.train_final_model(X, y, best_model_type=best_model)
+
+        # 5. Predict on Test Data (Using the Winner!)
+        predictions = pipeline.predict(test_df)
+        predictions.to_csv('predictions.csv')
+
+        logger.info(f"Predictions saved to {output_file}")
+      
         # 1. Load Data
         train_df, test_df = pipeline.load_data()
 
@@ -226,7 +282,7 @@ def main():
         logger.info(f"Predictions saved to {output_file}")
 
         # Feature Importance (Extracting from pipeline step)
-        if args.model == 'rf':
+        if best_model == 'rf':
             # We must access the steps by name to get to the feature importances
             model_step = pipeline.model.named_steps['classifier']
             preprocessor_step = pipeline.model.named_steps['preprocessor']
@@ -237,7 +293,7 @@ def main():
             
             imp_df = pd.DataFrame({'Feature': feature_names, 'Importance': importances})
             imp_df = imp_df.sort_values(by='Importance', ascending=False).head(20)
-            print("\nTop 20 Feature Importances:")
+            logger.info("\nTop 20 Feature Importances:")
             print(imp_df)
 
     except Exception as e:
