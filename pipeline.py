@@ -195,21 +195,21 @@ class ClinicalModelPipeline:
         return mean_auc
 
   def train_final_model(self, X: pd.DataFrame, y: pd.Series, best_model_type: str) -> None:
-          """
-          Takes the best model type, builds a pipeline, and trains it on entire training data.
-          """
-          logger.info(f"--- Preparing Final Model: {best_model_type.upper()} ---")
+        """
+        Takes the best model type, builds a pipeline, and trains it on entire training data.
+        """
+        logger.info(f"--- Preparing Final Model: {best_model_type.upper()} ---")
           
           # 1. Grab the best model
-          if best_model_type == 'xgb':
-              clf = XGBClassifier(
-                  n_estimators=300, max_depth=10, objective='binary:logistic',
-                  eval_metric='logloss', random_state=self.config.RANDOM_STATE
-              )
-          else:
-              clf = RandomForestClassifier(
-                  n_estimators=500, max_leaf_nodes=16, random_state=self.config.RANDOM_STATE
-              )
+        if best_model_type == 'xgb':
+            clf = XGBClassifier(
+                n_estimators=300, max_depth=10, objective='binary:logistic',
+                eval_metric='logloss', random_state=self.config.RANDOM_STATE
+            )
+        else:
+            clf = RandomForestClassifier(
+                n_estimators=500, max_leaf_nodes=16, random_state=self.config.RANDOM_STATE
+            )
 
         # 2. Build the final pipeline
         final_pipeline = self.build_pipeline(clf)
