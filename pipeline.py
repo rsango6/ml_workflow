@@ -201,24 +201,24 @@ class ClinicalModelPipeline:
       logger.info(f"--- Preparing Final Model: {best_model_type.upper()} ---")
           
         # 1. Grab the best model
-        if best_model_type == 'xgb':
+      if best_model_type == 'xgb':
             clf = XGBClassifier(
                 n_estimators=300, max_depth=10, objective='binary:logistic',
                 eval_metric='logloss', random_state=self.config.RANDOM_STATE
             )
-        else:
+      else:
             clf = RandomForestClassifier(
                 n_estimators=500, max_leaf_nodes=16, random_state=self.config.RANDOM_STATE
             )
 
-        # 2. Build the final pipeline
-        final_pipeline = self.build_pipeline(clf)
+      # 2. Build the final pipeline
+      final_pipeline = self.build_pipeline(clf)
         
-        # 3. Save it to the class and train on 100% of X and y
-        self.model = final_pipeline
-        self.model.fit(X, y)
+      # 3. Save it to the class and train on 100% of X and y
+      self.model = final_pipeline
+      self.model.fit(X, y)
         
-        logger.info("Final model successfully fitted and ready for testing")
+      logger.info("Final model successfully fitted and ready for testing")
 
     def predict(self, test_df: pd.DataFrame) -> pd.DataFrame:
         """
