@@ -30,14 +30,23 @@ class Config:
     Configuration class to ensure reproducibility and easy management of parameters.
     """
     def __init__(self, 
-                 train_path='Tim_21/Podaci/train.csv', 
-                 test_path='Tim_21/Podaci/test.csv', 
+                 data_dir='Tim_21/Podaci/',
                  random_state=42, 
                  cv_folds=5, 
                  target_col='Label'):
+
+        train_matches = glob.glob(os.path.join(data_dir, '*train*.csv'))
+        test_matches = glob.glob(os.path.join(data_dir, '*test*.csv'))
+
+        if not train_matches:
+            raise FileNotFoundError(f"No train CSV found in {data_dir}")
+        if not test_matches:
+            raise FileNotFoundError(f"No test CSV found in {data_dir}")
+        if len(train_matches) > 1:
+            logger.warning(f"Multiple train files found. Using the first one: {train_matches[0]}")
         
-        self.TRAIN_PATH = train_path
-        self.TEST_PATH = test_path
+        self.TRAIN_PATH = train_matches[0]
+        self.TEST_PATH = test_matches[0]
         self.RANDOM_STATE = random_state
         self.CV_FOLDS = cv_folds
         self.TARGET_COL = target_col
