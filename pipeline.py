@@ -225,15 +225,15 @@ class ClinicalModelPipeline:
         return results
 
 def main():
-    # Argument parsing allows this script to be run from the command line
-    # Example: python clinical_pipeline.py --model xgb
-    parser = argparse.ArgumentParser(description="Clinical Data Analysis Pipeline")
-    parser.add_argument('--model', type=str, default='rf', choices=['rf', 'xgb'], help='Model type to use (rf or xgb)')
+    parser = argparse.ArgumentParser(description="Clinical Data ML Pipeline")
+    parser.add_argument('--data_dir', type=str, default='Tim_21/Podaci/', help='Path to the directory where data resides')
+    parser.add_argument('--fast', action='store_true', help='Quick test with 2 CV folds')
+    
     args = parser.parse_args()
+    folds = 2 of args.fast else 5
 
     # Initialize Config
-    # If you want to change paths without touching code, you could add args for paths too
-    config = Config()
+    config = Config(data_dir=args.data_dir, cv_folds=folds)
     
     # Initialize Pipeline
     pipeline = ClinicalModelPipeline(config)
