@@ -194,13 +194,13 @@ class ClinicalModelPipeline:
 
         return mean_auc
 
-  def train_final_model(self, X: pd.DataFrame, y: pd.Series, best_model_type: str) -> None:
-        """
-        Takes the best model type, builds a pipeline, and trains it on entire training data.
-        """
-        logger.info(f"--- Preparing Final Model: {best_model_type.upper()} ---")
+    def train_final_model(self, X: pd.DataFrame, y: pd.Series, best_model_type: str) -> None:
+      """
+      Takes the best model type, builds a pipeline, and trains it on entire training data.
+      """
+      logger.info(f"--- Preparing Final Model: {best_model_type.upper()} ---")
           
-          # 1. Grab the best model
+        # 1. Grab the best model
         if best_model_type == 'xgb':
             clf = XGBClassifier(
                 n_estimators=300, max_depth=10, objective='binary:logistic',
@@ -226,7 +226,7 @@ class ClinicalModelPipeline:
         Handles all preprocessing internally via the pipeline.
         """
         if self.model is None:
-            raise ValueError("Model has not been trained yet. Call run_cv_evaluation first.")
+          raise ValueError("Model has not been trained yet. Call run_cv_evaluation first.")
         
         preds = self.model.predict(test_df)
         probs = self.model.predict_proba(test_df)
