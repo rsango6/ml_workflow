@@ -283,7 +283,7 @@ def main():
         output_file = 'predictions.csv'
         predictions.to_csv(output_file)
         logger.info(f"Predictions saved to {output_file}")
-      
+
         # Feature Importance (Extracting from pipeline step)
         if best_model == 'rf':
             # We must access the steps by name to get to the feature importances
